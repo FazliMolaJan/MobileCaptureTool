@@ -7,9 +7,12 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
+import android.support.design.internal.NavigationMenu;
+
 import android.support.design.widget.FloatingActionButton;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -17,6 +20,8 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.latina.capturetool.R;
+
+import io.github.yavski.fabspeeddial.FabSpeedDial;
 
 public class AlwaysTopService extends Service {
     private View mView;
@@ -27,6 +32,7 @@ public class AlwaysTopService extends Service {
     private int mViewX, mViewY;
 
     private boolean isMove = false;
+    FabSpeedDial fabSpeedDial;
     FloatingActionButton fab;
     private OnTouchListener mViewTouchListener = new OnTouchListener() {
         @Override
@@ -38,11 +44,21 @@ public class AlwaysTopService extends Service {
                     mTouchY = event.getRawY();
                     mViewX = mParams.x;
                     mViewY = mParams.y;
-                    fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(128,92,209,229)));
+                    fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255,92,209,229)));
                     break;
                 case MotionEvent.ACTION_UP:
-                    fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(128,178,235,244)));
+                    if(!fabSpeedDial.isMenuOpen())
+                        fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255,178,235,244)));
                     if (!isMove) { // 실제 클릭했을때 이 부분 구현
+                        if(fabSpeedDial.isMenuOpen()) {
+                            fabSpeedDial.closeMenu();
+                            fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255, 178, 235, 244)));
+                        }
+                        else {
+                            fabSpeedDial.animate();
+                            fabSpeedDial.openMenu();
+                            fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255,92,209,229)));
+                        }
                         Toast.makeText(getApplicationContext(), "터치됨", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -71,8 +87,24 @@ public class AlwaysTopService extends Service {
         LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = mInflater.inflate(R.layout.always_top, null);
 
+        fabSpeedDial = mView.findViewById(R.id.fab_main_dial);
         fab = mView.findViewById(R.id.fab);
+        fab.setSize(1);
         fab.setOnTouchListener(mViewTouchListener);
+        fabSpeedDial.setMenuListener(new FabSpeedDial.MenuListener() {
+            @Override
+            public boolean onPrepareMenu(NavigationMenu navigationMenu) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemSelected(MenuItem menuItem) {
+                return true;
+            }
+            @Override
+            public void onMenuClosed() {
+            }
+        });
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -80,7 +112,6 @@ public class AlwaysTopService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         mParams.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
-
         mManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mManager.addView(mView, mParams);
     }
