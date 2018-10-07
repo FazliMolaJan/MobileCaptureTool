@@ -79,7 +79,7 @@ public class AlwaysTopService extends Service {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, // PHONE 타입으로하면 에러남
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
-        mParams.gravity = Gravity.TOP | Gravity.LEFT;
+        mParams.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
 
         mManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mManager.addView(mView, mParams);
