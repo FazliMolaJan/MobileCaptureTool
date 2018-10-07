@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.os.IBinder;
 import android.support.design.internal.NavigationMenu;
 
@@ -112,6 +113,7 @@ public class AlwaysTopService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         mParams.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
+
         mManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mManager.addView(mView, mParams);
     }
