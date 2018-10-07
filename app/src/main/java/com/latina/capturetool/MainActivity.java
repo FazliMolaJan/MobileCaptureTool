@@ -3,6 +3,7 @@ package com.latina.capturetool;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        final View rootView = this.findViewById(android.R.id.content);
         alwaysServiceIntent = new Intent(this, AlwaysTopService.class);
         startOverlayWindowService(this);
 
@@ -31,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap b = Screenshot.takeScreenshotOfRootView(imageView);
+                Bitmap b = Screenshot.takeScreenshotOfRootView(rootView);
                 imageView.setImageBitmap(b);
+                rootView.setBackgroundColor(Color.parseColor("#999999"));
+                rootView.setBackgroundColor(Color.argb(0,0,0,0));
             }
         });
     }
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE);
         } else {
             Toast.makeText(this, "권한 확인 완료", Toast.LENGTH_SHORT).show();
-            //initWindowLayout();
+            initWindowLayout();
         }
     }
     private void initWindowLayout() {
