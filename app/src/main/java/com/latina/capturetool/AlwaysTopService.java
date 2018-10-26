@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.design.internal.NavigationMenu;
 
@@ -18,12 +18,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
-import android.widget.Toast;
-
-import com.latina.capturetool.R;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 
+//Always On Top View 떠있는 서비스
 public class AlwaysTopService extends Service {
     private View mView;
     private WindowManager mManager;
@@ -35,6 +33,7 @@ public class AlwaysTopService extends Service {
     private boolean isMove = false;
     FabSpeedDial fabSpeedDial;
     FloatingActionButton fab;
+
     private OnTouchListener mViewTouchListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -60,7 +59,6 @@ public class AlwaysTopService extends Service {
                             fabSpeedDial.openMenu();
                             fab.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255,92,209,229)));
                         }
-                        Toast.makeText(getApplicationContext(), "터치됨", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
@@ -86,20 +84,32 @@ public class AlwaysTopService extends Service {
         super.onCreate();
         setTheme(R.style.AppTheme); // FAB 가 ATV에서 구동하기 위해 설정
         LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mView = mInflater.inflate(R.layout.always_top, null);
 
+        mView = mInflater.inflate(R.layout.always_top, null);
         fabSpeedDial = mView.findViewById(R.id.fab_main_dial);
         fab = mView.findViewById(R.id.fab);
         fab.setSize(1);
         fab.setOnTouchListener(mViewTouchListener);
+
         fabSpeedDial.setMenuListener(new FabSpeedDial.MenuListener() {
             @Override
             public boolean onPrepareMenu(NavigationMenu navigationMenu) {
                 return true;
             }
-
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
+                switch(menuItem.getItemId()) {
+                    case R.id.capture :
+                        fabSpeedDial.hide();
+                        startActivity(new Intent(getApplicationContext(), ScreenShot.class));
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                fabSpeedDial.show();
+                            }
+                        }, 2000);
+                        break;
+                }
                 return true;
             }
             @Override

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.latina.capturetool">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
@@ -22,7 +23,15 @@
         <service
             android:name=".AlwaysTopService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <activity
+            android:name=".CaptureActivity"
+            android:label=""
+            android:theme="@style/Theme.AppCompat.Transparent" />
+
+        <activity android:name=".ScreenShot"
+            android:label=""
+            android:theme="@style/Theme.AppCompat.Transparent" />
     </application>
 
 </manifest>
