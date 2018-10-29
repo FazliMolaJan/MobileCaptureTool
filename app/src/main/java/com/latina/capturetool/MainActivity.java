@@ -27,8 +27,9 @@ public class MainActivity extends AppCompatActivity {
         alwaysServiceIntent = new Intent(this, AlwaysTopService.class);
         startOverlayWindowService(this);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
         }
         button = findViewById(R.id.screenshot);
     }
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
                 } else
                     Toast.makeText(MainActivity.this, "오버레이 권한이 없습니다.", Toast.LENGTH_SHORT).show();
             }
-        }
+        } else if(requestCode == 100 && resultCode != RESULT_OK)
+            finish();
     }
     public void onClick(View v) {
         stopService(alwaysServiceIntent);

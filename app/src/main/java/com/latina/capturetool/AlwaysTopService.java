@@ -107,7 +107,7 @@ public class AlwaysTopService extends Service {
                             public void run() {
                                 fabSpeedDial.show();
                             }
-                        }, 2000);
+                        }, 3500);
                         break;
                 }
                 return true;

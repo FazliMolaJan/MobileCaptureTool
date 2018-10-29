@@ -12,7 +12,11 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -27,4 +31,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:design:26.1.0'
     implementation 'io.github.yavski:fab-speed-dial:1.0.7'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    implementation 'com.github.infotech-group:CanvasView:1.0.0'
 }
