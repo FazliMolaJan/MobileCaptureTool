@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#FF000000">
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/capture_toolbar"
         android:layout_width="match_parent"
@@ -16,170 +15,176 @@
         app:title=""
         android:layout_height="?attr/actionBarSize"/>
 
-    <com.android.graphics.CanvasView
-        android:id="@+id/canvas"
+    <LinearLayout
+        android:id="@+id/base_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:background="@android:color/black" />
-
-    <RelativeLayout
-        android:id="@+id/drawContainer"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom"
-        android:background="#AABDBDBD"
-        android:gravity="center_vertical"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/backPress"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"
-            android:background="@android:drawable/presence_offline"
-            android:onClick="onDrawClick" />
-
-        <Button
-            android:id="@+id/pen_red"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_centerHorizontal="true"
-            android:layout_toRightOf="@id/backPress"
-            android:background="@drawable/btn_red"
-            android:onClick="onDrawClick" />
-
-        <Button
-            android:id="@+id/pen_blue"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/pen_red"
-            android:background="@drawable/btn_blue"
-            android:onClick="onDrawClick" />
-
-        <Button
-            android:id="@+id/pen_black"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_toRightOf="@id/pen_blue"
-            android:background="@drawable/btn_black_select"
-            android:onClick="onDrawClick" />
-
-        <SeekBar
-            android:id="@+id/widthSeekbar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_toLeftOf="@+id/undoButton"
-            android:layout_toRightOf="@id/pen_black"
-            android:max="10"
-            android:progress="5"
-            android:progressTint="@android:color/white"
-            android:thumbTint="#AABDBDBD" />
-
-        <Button
-            android:id="@+id/undoButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:layout_toLeftOf="@+id/redoButton"
-            android:background="@drawable/btn_bg"
-            android:onClick="onDrawClick"
-            android:text="◀"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/redoButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:layout_toLeftOf="@+id/clearButton"
-            android:background="@drawable/btn_bg"
-            android:onClick="onDrawClick"
-            android:text="▶"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/clearButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_bg"
-            android:onClick="onDrawClick"
-            android:text="C"
-            android:textSize="20sp" />
-    </RelativeLayout>
-
-    <!-- Type Container -->
-    <LinearLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="visible">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
+        android:orientation="vertical">
+        <com.latina.capturetool.CanvasView
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="onClick"
-            app:backgroundTint="#000000"
-            app:fabSize="mini"
-            app:rippleColor="@android:color/white"
-            app:srcCompat="@drawable/delete"
-            app:tint="@android:color/white" />
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:background="@android:color/black" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
-            android:layout_weight="1"
-            android:onClick="onClick"
-            app:backgroundTint="#000000"
-            app:fabSize="mini"
-            app:rippleColor="@android:color/white"
-            app:srcCompat="@drawable/drawing"
-            app:tint="@android:color/white" />
+        <RelativeLayout
+            android:id="@+id/drawContainer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:background="#AABDBDBD"
+            android:gravity="center_vertical"
+            android:visibility="gone">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/crop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
-            android:layout_weight="1"
-            android:onClick="onClick"
-            android:tint="@android:color/white"
-            app:backgroundTint="#000000"
-            app:fabSize="mini"
-            app:rippleColor="@android:color/white"
-            app:srcCompat="@drawable/crop" />
+            <Button
+                android:id="@+id/backPress"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
+                android:background="@android:drawable/presence_offline"
+                android:onClick="onDrawClick" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/check"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onClick"
-            android:tint="@android:color/white"
-            app:backgroundTint="#000000"
-            app:fabSize="mini"
-            app:rippleColor="@android:color/white"
-            app:srcCompat="@drawable/check" />
+            <Button
+                android:id="@+id/pen_red"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerHorizontal="true"
+                android:layout_toRightOf="@id/backPress"
+                android:background="@drawable/btn_red"
+                android:onClick="onDrawClick" />
+
+            <Button
+                android:id="@+id/pen_blue"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toRightOf="@id/pen_red"
+                android:background="@drawable/btn_blue"
+                android:onClick="onDrawClick" />
+
+            <Button
+                android:id="@+id/pen_black"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_toRightOf="@id/pen_blue"
+                android:background="@drawable/btn_black_select"
+                android:onClick="onDrawClick" />
+
+            <SeekBar
+                android:id="@+id/widthSeekbar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toLeftOf="@+id/undoButton"
+                android:layout_toRightOf="@id/pen_black"
+                android:max="10"
+                android:progress="5"
+                android:progressTint="@android:color/white"
+                android:thumbTint="#AABDBDBD" />
+
+            <Button
+                android:id="@+id/undoButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="2dp"
+                android:layout_toLeftOf="@+id/redoButton"
+                android:background="@drawable/btn_bg"
+                android:onClick="onDrawClick"
+                android:text="◀"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/redoButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="2dp"
+                android:layout_toLeftOf="@+id/clearButton"
+                android:background="@drawable/btn_bg"
+                android:onClick="onDrawClick"
+                android:text="▶"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/clearButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_margin="2dp"
+                android:background="@drawable/btn_bg"
+                android:onClick="onDrawClick"
+                android:text="C"
+                android:textSize="20sp" />
+        </RelativeLayout>
+
+        <!-- Type Container -->
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                app:backgroundTint="#000000"
+                app:fabSize="mini"
+                app:rippleColor="@android:color/white"
+                app:srcCompat="@drawable/delete"
+                app:tint="@android:color/white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                app:backgroundTint="#000000"
+                app:fabSize="mini"
+                app:rippleColor="@android:color/white"
+                app:srcCompat="@drawable/drawing"
+                app:tint="@android:color/white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/crop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:tint="@android:color/white"
+                app:backgroundTint="#000000"
+                app:fabSize="mini"
+                app:rippleColor="@android:color/white"
+                app:srcCompat="@drawable/crop" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:tint="@android:color/white"
+                app:backgroundTint="#000000"
+                app:fabSize="mini"
+                app:rippleColor="@android:color/white"
+                app:srcCompat="@drawable/check" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

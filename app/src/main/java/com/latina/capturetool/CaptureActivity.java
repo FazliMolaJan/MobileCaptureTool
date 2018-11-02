@@ -18,13 +18,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
-import com.android.graphics.CanvasView;
 import java.io.File;
 
 //이미지 수신 액티비티
 public class CaptureActivity extends AppCompatActivity {
-
     private CanvasView canvas;
     FloatingActionButton btn_delete, btn_edit, btn_crop, btn_check;
     Button btn_red, btn_blue, btn_black;
@@ -32,7 +31,8 @@ public class CaptureActivity extends AppCompatActivity {
     Button btn_undo, btn_redo, btn_clear, btn_back;
     RelativeLayout drawingContainer;
     LinearLayout container;
-
+    LinearLayout baseContainer;
+    
     String filePath;
     boolean isChanged = false;
     @Override
@@ -64,6 +64,8 @@ public class CaptureActivity extends AppCompatActivity {
         btn_redo = findViewById(R.id.redoButton);
         btn_clear = findViewById(R.id.clearButton);
         btn_back = findViewById(R.id.backPress);
+        baseContainer = findViewById(R.id.base_container);
+
         strokeWidth.setOnSeekBarChangeListener(seekBarChangeListener);
 
         // 스크린샷된 이미지 경로로부터 가져오기
@@ -76,6 +78,8 @@ public class CaptureActivity extends AppCompatActivity {
         canvas.drawBitmap(myBitmap);
         canvas.setLineCap(Paint.Cap.ROUND);
         canvas.setPaintStrokeWidth(5F);
+
+        canvas.setDrawable(false);
     }
     public void onClick(View v) {
         if(v == btn_delete) {
@@ -84,6 +88,7 @@ public class CaptureActivity extends AppCompatActivity {
             if(file.exists())
                 file.delete();
         } else if(v == btn_edit) {
+            canvas.setDrawable(true);
             container.setVisibility(View.GONE);
             drawingContainer.setVisibility(View.VISIBLE);
         } else if(v == btn_crop) {
@@ -97,10 +102,10 @@ public class CaptureActivity extends AppCompatActivity {
 
         }
     }
-
     // 편집 모드 수정 리스너
     public void onDrawClick(View v) {
         if(v == btn_back) {
+            canvas.setDrawable(false);
             container.setVisibility(View.VISIBLE);
             drawingContainer.setVisibility(View.GONE);
         } else if(v == btn_red) {
@@ -119,7 +124,7 @@ public class CaptureActivity extends AppCompatActivity {
             canvas.undo();
         } else if(v == btn_redo) {
             canvas.redo();
-        } else if(v == btn_clear) {
+        } else if(v == btn_clear) { // 그렸던 작업 초기화
             while(canvas.undo());
         }
     }
