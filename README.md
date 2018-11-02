@@ -1,17 +1,21 @@
 # MobileCaptureTool
-Toy Project - Using Media projection.
-Screenshot Capture Application
+Toy Project - Screenshot Using Media projection
+
+-Screenshot Capture Application-
 
 ## Project information
   * Project period : 18/10/
 
 
+
 ## Requirements
   * Min Sdk Version : 21 (5.0 / Lolipop)
   * Target Sdk Version : 26 (8.0 / Oreo)
-  
+
+
 
 ## Screenshot
+  
   
   
 ## References
