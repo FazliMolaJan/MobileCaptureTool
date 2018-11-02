@@ -27,8 +27,7 @@
         <activity
             android:name=".CaptureActivity"
             android:label=""
-            android:theme="@style/Theme.AppCompat.Transparent" >
-
+            android:theme="@style/MyTheme">
         </activity>
         <activity
             android:name=".ScreenShot"
