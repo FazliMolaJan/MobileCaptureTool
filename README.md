@@ -5,6 +5,8 @@ Toy Project - Screenshot using Media projection
 
 ## Project information
   * Project period : 18/10/07 ~ Current
+  * Project environment
+    * Framework : Android
 
 
 
