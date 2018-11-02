@@ -1,5 +1,5 @@
 # MobileCaptureTool
-Toy Project - Screenshot Using Media projection
+Toy Project - Screenshot using Media projection
 
 -Screenshot Capture Application-
 
