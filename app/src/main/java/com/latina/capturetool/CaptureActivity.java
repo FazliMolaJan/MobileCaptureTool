@@ -23,8 +23,8 @@ public class CaptureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture);
 
-        //String filePath = getIntent().getStringExtra("image");
-        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/image2.jpg";
+        String filePath = getIntent().getStringExtra("image");
+        //String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/image2.jpg";
         File file = new File(filePath);
         Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 
