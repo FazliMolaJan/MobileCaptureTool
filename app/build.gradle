@@ -30,7 +30,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:design:26.1.0'
+    // Speed Dial FAB
     implementation 'io.github.yavski:fab-speed-dial:1.0.7'
+    // Cropper
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    // CanvasView
     implementation 'com.github.infotech-group:CanvasView:1.0.0'
 }
