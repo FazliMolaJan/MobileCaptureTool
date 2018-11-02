@@ -4,7 +4,7 @@ Toy Project - Screenshot using Media projection
 -Screenshot Capture Application-
 
 ## Project information
-  * Project period : 18/10/
+  * Project period : 18/10/07 ~ Current
 
 
 
