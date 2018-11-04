@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.screenshot);
     }
 
-    public void startOverlayWindowService(Context context) {
+    public void startOverlayWindowService(Context context) { // 앱 위에 표시 권한 신청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERAY_CODE);
@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
     }
     private void initWindowLayout() {
         startService(alwaysServiceIntent);
-    }
+    } // 서비스 On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OVERAY_CODE && resultCode == RESULT_OK) {
+        if (requestCode == OVERAY_CODE && resultCode == RESULT_OK) { // 앱 위에 표시 권한
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(this)) {
                     Toast.makeText(MainActivity.this, "오버레이 권한 확인 완료", Toast.LENGTH_SHORT).show();
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 } else
                     Toast.makeText(MainActivity.this, "오버레이 권한이 없습니다.", Toast.LENGTH_SHORT).show();
             }
-        } else if(requestCode == 100 && resultCode != RESULT_OK)
+        } else if(requestCode == 100 && resultCode != RESULT_OK) // 쓰기 권한 확인
             finish();
     }
     public void onClick(View v) {

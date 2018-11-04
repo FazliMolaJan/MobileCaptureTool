@@ -94,8 +94,9 @@ public class CanvasView extends View {
     private float controlX = 0F;
     private float controlY = 0F;
 
-    // for enable mode
+    // for enable & draw status
     private boolean drawable = true;
+    private boolean changed = false;
     /**
      * Copy Constructor
      *
@@ -444,6 +445,8 @@ public class CanvasView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(drawable) {
+            if(!changed)
+                changed = true;
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     this.onActionDown(event);
@@ -869,11 +872,29 @@ public class CanvasView extends View {
         return this.getBitmapAsByteArray(CompressFormat.PNG, 100);
     }
 
-    // This method set to draw
+    /**
+     * This method allows you can draw or can't draw.
+     *
+     * @param drawable
+     */
     public void setDrawable(boolean drawable) {
         this.drawable = drawable;
     }
-    // This method return "true" you if you can draw.
-    public boolean getDrawable() { return drawable; }
-}
 
+    /**
+     * This method returns "true" if it can be drawn. Otherwise, return "false".
+     *
+     * @return
+     */
+    public boolean isDrawable() { return drawable; }
+
+    /**
+     * This Method returns "true" if it is changed.
+     *
+     * @return
+     */
+    public boolean isChanged() { return changed; }
+
+    public void clearChanged() { this.changed = false; }
+
+}

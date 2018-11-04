@@ -1,11 +1,19 @@
 package com.latina.capturetool;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +29,8 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 //이미지 수신 액티비티
 public class CaptureActivity extends AppCompatActivity {
@@ -32,9 +42,9 @@ public class CaptureActivity extends AppCompatActivity {
     RelativeLayout drawingContainer;
     LinearLayout container;
     LinearLayout baseContainer;
-    
+
     String filePath;
-    boolean isChanged = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +80,10 @@ public class CaptureActivity extends AppCompatActivity {
 
         // 스크린샷된 이미지 경로로부터 가져오기
         filePath = getIntent().getStringExtra("image");
+        if(filePath == null) { // 잘못 실행 될 경우 이동
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }
         File file = new File(filePath);
         Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 
@@ -77,86 +91,165 @@ public class CaptureActivity extends AppCompatActivity {
         canvas = findViewById(R.id.canvas);
         canvas.drawBitmap(myBitmap);
         canvas.setLineCap(Paint.Cap.ROUND);
-        canvas.setPaintStrokeWidth(5F);
-
+        canvas.setPaintStrokeWidth(10F);
         canvas.setDrawable(false);
     }
+
+    // 일반 모드 리스너
     public void onClick(View v) {
-        if(v == btn_delete) {
-            // Dialog로 삭제 확인 필요
-            File file = new File(filePath);
-            if(file.exists())
-                file.delete();
-        } else if(v == btn_edit) {
+        if (v == btn_delete) { // 삭제 버튼
+            delete();
+        } else if (v == btn_edit) { // 그리기 모드
             canvas.setDrawable(true);
             container.setVisibility(View.GONE);
             drawingContainer.setVisibility(View.VISIBLE);
-        } else if(v == btn_crop) {
+        } else if (v == btn_crop) { // 사이즈 편집 버튼
 
-        } else if(v == btn_check) {
+        } else if (v == btn_check) { // 확인 후 저장 버튼
             save();
         }
     }
-    private void save() {
-        if(isChanged) {
 
-        }
-    }
     // 편집 모드 수정 리스너
     public void onDrawClick(View v) {
-        if(v == btn_back) {
+        if (v == btn_back) { // 뒤로 가기 버튼
             canvas.setDrawable(false);
             container.setVisibility(View.VISIBLE);
             drawingContainer.setVisibility(View.GONE);
-        } else if(v == btn_red) {
+        } else if (v == btn_red) { // 빨강 펜
             clearColorButton();
             btn_red.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_red_select));
             canvas.setPaintStrokeColor(Color.RED);
-        } else if(v == btn_blue) {
+        } else if (v == btn_blue) { // 파랑 펜
             clearColorButton();
             btn_blue.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_blue_select));
             canvas.setPaintStrokeColor(Color.BLUE);
-        } else if(v == btn_black) {
+        } else if (v == btn_black) { // 검정 펜
             clearColorButton();
             btn_black.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_black_select));
             canvas.setPaintStrokeColor(Color.BLACK);
-        } else if(v == btn_undo) {
+        } else if (v == btn_undo) { // Undo 버튼
             canvas.undo();
-        } else if(v == btn_redo) {
+            if(!canvas.undo())
+                canvas.clearChanged();
+            else
+                canvas.redo();
+        } else if (v == btn_redo) { // Redo 버튼
             canvas.redo();
-        } else if(v == btn_clear) { // 그렸던 작업 초기화
-            while(canvas.undo());
+        } else if (v == btn_clear) { // 그렸던 작업 초기화
+            while (canvas.undo()) ;
+            canvas.clearChanged();
         }
     }
+
+    private void save() { // 이미지 저장(변경이 되었을 경우 동작)
+        if (canvas.isChanged()) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+            else {
+                FileOutputStream fos;
+                try {
+                    File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CaptureTool");
+                    if (!dir.exists())
+                        dir.mkdir();
+                    File file = new File(filePath);
+                    if (!file.exists())
+                        file.createNewFile();
+                    fos = new FileOutputStream(file);
+                    Bitmap bitmap = canvas.getBitmap();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    fos.close();
+                    Toast.makeText(this, "저장 완료", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) { e.printStackTrace(); }
+                finish();
+            }
+        } else
+            finish();
+    }
+    private void delete() { // 이미지 삭제
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setTitle("삭제");
+        builder.setMessage("삭제 하시겠습니까?");
+        builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                File file = new File(filePath);
+                if (file.exists())
+                    file.delete();
+                finish();
+            }
+        });
+        builder.setNegativeButton("취소", null);
+        builder.create().show();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 100 && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                save();
+            else
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     // 색상 버튼 이미지 초기화
     private void clearColorButton() {
         btn_red.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_red));
         btn_blue.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_blue));
         btn_black.setBackground(ContextCompat.getDrawable(this, R.drawable.btn_black));
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_capture, menu);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) { // 뒤로 가기
-            finish();
+        if (item.getItemId() == android.R.id.home) { // 뒤로 가기
+            saveCheck();
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void saveCheck() { // 뒤로 가기 클릭 시 저장 할지 여부 확인 후 종료
+        if (canvas.isChanged()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(android.R.drawable.ic_menu_save);
+            builder.setTitle("저장");
+            builder.setMessage("변경 사항이 있습니다. 저장 하시겠습니까?");
+            builder.setCancelable(false);
+            builder.setPositiveButton("저장", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    save();
+                }
+            });
+            builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.create().show();
+        } else
+            finish();
     }
     // 선 굵기 이벤트 리스너
     SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            canvas.setPaintStrokeWidth((float)progress);
+            canvas.setPaintStrokeWidth((float) progress * 2);
         }
+
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
 
         }
+
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
 
