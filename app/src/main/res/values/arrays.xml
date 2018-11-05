@@ -4,5 +4,6 @@
         <item>@android:color/holo_red_dark</item>
         <item>@android:color/holo_purple</item>
         <item>@android:color/holo_green_light</item>
+        <item>@android:color/black</item>
     </integer-array>
 </resources>

@@ -8,7 +8,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,9 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,9 +46,9 @@ public class CaptureActivity extends AppCompatActivity {
     Button btn_undo, btn_redo, btn_clear, btn_back;
     RelativeLayout drawingContainer;
     LinearLayout container;
-    LinearLayout baseContainer;
 
-    String filePath;
+    String filePath; // 이미지 파일 경로
+    private String cachePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +79,6 @@ public class CaptureActivity extends AppCompatActivity {
         btn_redo = findViewById(R.id.redoButton);
         btn_clear = findViewById(R.id.clearButton);
         btn_back = findViewById(R.id.backPress);
-        baseContainer = findViewById(R.id.base_container);
 
         strokeWidth.setOnSeekBarChangeListener(seekBarChangeListener);
 
@@ -104,7 +108,11 @@ public class CaptureActivity extends AppCompatActivity {
             container.setVisibility(View.GONE);
             drawingContainer.setVisibility(View.VISIBLE);
         } else if (v == btn_crop) { // 사이즈 편집 버튼
-
+            Bitmap bitmap = canvas.getBitmap(); // Bitmap to Uri
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            cachePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
+            CropImage.activity(Uri.parse(cachePath)).start(this); // CropImage Start
         } else if (v == btn_check) { // 확인 후 저장 버튼
             save();
         }
@@ -183,6 +191,30 @@ public class CaptureActivity extends AppCompatActivity {
         builder.setNegativeButton("취소", null);
         builder.create().show();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) { // Crop 결과 들어오면 실행
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK && result != null) {
+                try {
+                    deleteCacheFile();
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result.getUri()); // Uri -> Bitmap
+                    int canvasWidth = (bitmap.getWidth() > canvas.getWidth()) ? canvas.getWidth() : bitmap.getWidth();
+                    int canvasHeight = (bitmap.getHeight() > canvas.getHeight()) ? canvas.getHeight() : bitmap.getHeight();
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(canvasWidth, canvasHeight);
+                    params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                    canvas.setLayoutParams(params);
+                    Toast.makeText(this, "Width : " + canvas.getWidth() + " Height : " + canvas.getHeight(), Toast.LENGTH_SHORT).show();
+                    canvas.drawBitmap(bitmap);
+                } catch(IOException e) {e.printStackTrace(); }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                result.getError().printStackTrace();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 100 && grantResults.length > 0) {
@@ -255,4 +287,17 @@ public class CaptureActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    private void deleteCacheFile() { // Temp 이미지 삭제
+        File file = new File(UriManager.getPath(this, Uri.parse(cachePath)));
+        if (file.exists()) {
+            file.delete();
+            Toast.makeText(this, "삭제 완료", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -27,19 +27,21 @@ import java.util.Date;
 
 public class ScreenShot extends AppCompatActivity {
     private final int REQUEST_CODE = 200;
+    private final int CAPTURE_DELAY = 1500;
+
     private MediaProjection mediaProjection;
     private MediaProjectionManager projectionManager;
     private VirtualDisplay virtualDisplay;
 
     private int deviceWidth;
     private int deviceHeight;
-    int screenDensity;
+    private int screenDensity;
 
-    int resultCode;
-    Intent resultData;
+    private int resultCode;
+    private Intent resultData;
 
-    ImageReader imageReader;
-    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
+    private ImageReader imageReader;
+    private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class ScreenShot extends AppCompatActivity {
         startActivityForResult(projectionManager.createScreenCaptureIntent(), REQUEST_CODE);
         startScreenCapture();
     }
-    // Capture하기 전 객체 생성 확인 단계
+    // Capture 전 객체 생성 확인 단계
     private void startScreenCapture() {
         if (mediaProjection != null) { // Display만 꺼진상태
             setUpVirtualDisplay();
@@ -80,8 +82,9 @@ public class ScreenShot extends AppCompatActivity {
                     setUpMediaProjection();
                     setUpVirtualDisplay();
                 }
-            }, 1500);
-        }
+            }, CAPTURE_DELAY); // 해당 시각 이후 촬영
+        } else
+            finish();
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -90,7 +93,7 @@ public class ScreenShot extends AppCompatActivity {
         mediaProjection = projectionManager.getMediaProjection(resultCode, resultData);
     }
 
-    // Display 촬영 메소드
+    // Display 촬영
     private void setUpVirtualDisplay() {
         if(imageReader != null)
             imageReader.close();
@@ -136,7 +139,7 @@ public class ScreenShot extends AppCompatActivity {
                     fos.write(byteArray);
                     fos.close();
                     Intent intent = new Intent(getApplicationContext(), CaptureActivity.class);
-                    intent.putExtra("image", file.getAbsolutePath());
+                    intent.putExtra("image", file.getAbsolutePath()); // 저장 후 이미지 경로 전달
                     startActivity(intent);
                 } catch(Exception e )  { }
             }
@@ -150,6 +153,7 @@ public class ScreenShot extends AppCompatActivity {
         virtualDisplay = null;
         tearDownMediaProjection();
     }
+    // Media Projection 연결 해제
     private void tearDownMediaProjection() {
         if (mediaProjection != null) {
             mediaProjection.stop();

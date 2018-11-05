@@ -34,4 +34,5 @@ dependencies {
     implementation 'io.github.yavski:fab-speed-dial:1.0.7'
     // Cropper
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    //Glide
 }

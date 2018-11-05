@@ -19,7 +19,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <service
             android:name=".AlwaysTopService"
             android:enabled="true"
@@ -33,6 +32,8 @@
             android:name=".ScreenShot"
             android:label=""
             android:theme="@style/Theme.AppCompat.Transparent" />
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
     </application>
 
 </manifest>

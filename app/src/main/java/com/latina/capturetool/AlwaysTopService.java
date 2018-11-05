@@ -23,8 +23,8 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 
 //Always On Top View 떠있는 서비스
 public class AlwaysTopService extends Service {
-    private View mView;
-    private WindowManager mManager;
+    private View mView; // AOT View
+    private WindowManager mManager; // 서비스 매니저
     private WindowManager.LayoutParams mParams;
 
     private float mTouchX, mTouchY;
@@ -99,7 +99,7 @@ public class AlwaysTopService extends Service {
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
                 switch(menuItem.getItemId()) {
-                    case R.id.capture :
+                    case R.id.menu_capture :
                         fabSpeedDial.hide();
                         startActivity(new Intent(getApplicationContext(), ScreenShot.class));
                         new Handler().postDelayed(new Runnable() {
