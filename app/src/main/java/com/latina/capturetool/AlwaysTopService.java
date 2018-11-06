@@ -1,8 +1,10 @@
 package com.latina.capturetool;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -34,6 +36,20 @@ public class AlwaysTopService extends Service {
     private boolean isMove = false;
     FabSpeedDial fabSpeedDial;
     FloatingActionButton fab;
+
+    public static final String SERVICE_RECEIVER = "com.latina.capturetool.receiver";
+
+    BroadcastReceiver serviceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(SERVICE_RECEIVER))
+                if (intent.getBooleanExtra("hide", false))
+                    fab.hide();
+                else
+                    fab.show();
+        }
+    };
 
     private OnTouchListener mViewTouchListener = new OnTouchListener() {
         @Override
@@ -92,6 +108,8 @@ public class AlwaysTopService extends Service {
         fab.setSize(1);
         fab.setOnTouchListener(mViewTouchListener);
 
+        registerReceiver(serviceReceiver, new IntentFilter(SERVICE_RECEIVER));
+
         fabSpeedDial.setMenuListener(new FabSpeedDial.MenuListener() {
             @Override
             public boolean onPrepareMenu(NavigationMenu navigationMenu) {
@@ -102,7 +120,6 @@ public class AlwaysTopService extends Service {
                 switch(menuItem.getItemId()) {
                     case R.id.menu_capture : // 촬영 버튼
                         startActivity(new Intent(getApplicationContext(), ScreenShot.class));
-                        Toast.makeText(AlwaysTopService.this, "촬영 완료", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.menu_capture_edit :
                         Intent intent = new Intent(getApplicationContext(), ScreenShot.class);
@@ -129,6 +146,7 @@ public class AlwaysTopService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(serviceReceiver);
         if (mView != null) {
             mManager.removeView(mView);
             mView = null;

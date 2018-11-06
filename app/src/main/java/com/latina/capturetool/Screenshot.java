@@ -26,32 +26,36 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ScreenShot extends AppCompatActivity {
-    private final int REQUEST_CODE = 200;
-    private final int CAPTURE_DELAY = 1500;
+    private final int REQUEST_CODE = 200; // Overlay 권한
+    private final int CAPTURE_DELAY = 1500; // 사진 촬영 딜레이 : 없으면 바로 넘어가서 에러남
 
-    private MediaProjection mediaProjection;
-    private MediaProjectionManager projectionManager;
-    private VirtualDisplay virtualDisplay;
+    private MediaProjection mediaProjection; // 미디어 프로젝션 환경
+    private MediaProjectionManager projectionManager; // 프로젝션 매니저
+    private VirtualDisplay virtualDisplay; // 디스플레이 관찰자
 
     private int deviceWidth;
     private int deviceHeight;
     private int screenDensity;
 
-    private int resultCode;
-    private Intent resultData;
+    private int resultCode; // 프로젝션 권한
+    private Intent resultData; // 프로젝션 권한
 
-    private ImageReader imageReader;
+    private ImageReader imageReader; // 디스플레이 이미지 저장 리더
     private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
-    private boolean editMode;
+    private boolean editMode; // 편집 모드 true : 편집 | false : 편집 x
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.screenshot);
+
+        // Media Projection 촬영 크기 지정
         DisplayMetrics disp = getResources().getDisplayMetrics();
         deviceWidth = disp.widthPixels;
         deviceHeight = disp.heightPixels;
         screenDensity = disp.densityDpi;
+
+        showFabButton(true);
 
         editMode = getIntent().getBooleanExtra("mode", false);
         projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
@@ -60,7 +64,7 @@ public class ScreenShot extends AppCompatActivity {
     }
     // Capture 전 객체 생성 확인 단계
     private void startScreenCapture() {
-        if (mediaProjection != null) { // Display만 꺼진상태
+        if (mediaProjection != null) { // Display 꺼진상태
             setUpVirtualDisplay();
         } else if (resultCode != 0 && resultData != null) { // Projection 객체 미생성
             setUpMediaProjection(); // Media Projection 생성
@@ -72,10 +76,6 @@ public class ScreenShot extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             // 사용자가 권한을 허용해주었는지에 대한 처리
-            if (resultCode != RESULT_OK) {
-                // 사용자가 권한을 허용해주지 않았습니다.
-                return;
-            }
             this.resultCode = resultCode;
             resultData = data;
             finish();
@@ -86,8 +86,10 @@ public class ScreenShot extends AppCompatActivity {
                     setUpVirtualDisplay();
                 }
             }, CAPTURE_DELAY); // 해당 시각 이후 촬영
-        } else
+        } else {
             finish();
+            showFabButton(false);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -141,11 +143,14 @@ public class ScreenShot extends AppCompatActivity {
                     fos = new FileOutputStream(file);
                     fos.write(byteArray);
                     fos.close();
-                    if(editMode) {
+                    if(editMode) { // 촬영 모드
                         Intent intent = new Intent(getApplicationContext(), CaptureActivity.class);
                         intent.putExtra("image", file.getAbsolutePath()); // 저장 후 이미지 경로 전달
                         startActivity(intent);
+                    } else { // 바로 촬영 모드
+
                     }
+                    showFabButton(false);
                 } catch(Exception e )  { }
             }
         }, 500);
@@ -164,5 +169,11 @@ public class ScreenShot extends AppCompatActivity {
             mediaProjection.stop();
             mediaProjection = null;
         }
+    }
+
+    private void showFabButton(boolean hide) {
+        Intent intent = new Intent(AlwaysTopService.SERVICE_RECEIVER);
+        intent.putExtra("hide", hide);
+        sendBroadcast(intent);
     }
 }
