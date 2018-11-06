@@ -4,7 +4,7 @@ Toy Project - Screenshot using Media projection
 -Screenshot Capture Application-
 
 ## Project information
-  * Project period : 18/10/07 ~ Current
+  * Project period : 18/10/07 ~ 18/11/06
   * Project environment
     * Framework : Android
 
