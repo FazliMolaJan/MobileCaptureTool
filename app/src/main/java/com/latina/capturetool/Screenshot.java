@@ -42,6 +42,8 @@ public class ScreenShot extends AppCompatActivity {
 
     private ImageReader imageReader;
     private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
+
+    private boolean editMode;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +53,7 @@ public class ScreenShot extends AppCompatActivity {
         deviceHeight = disp.heightPixels;
         screenDensity = disp.densityDpi;
 
+        editMode = getIntent().getBooleanExtra("mode", false);
         projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         startActivityForResult(projectionManager.createScreenCaptureIntent(), REQUEST_CODE);
         startScreenCapture();
@@ -138,9 +141,11 @@ public class ScreenShot extends AppCompatActivity {
                     fos = new FileOutputStream(file);
                     fos.write(byteArray);
                     fos.close();
-                    Intent intent = new Intent(getApplicationContext(), CaptureActivity.class);
-                    intent.putExtra("image", file.getAbsolutePath()); // 저장 후 이미지 경로 전달
-                    startActivity(intent);
+                    if(editMode) {
+                        Intent intent = new Intent(getApplicationContext(), CaptureActivity.class);
+                        intent.putExtra("image", file.getAbsolutePath()); // 저장 후 이미지 경로 전달
+                        startActivity(intent);
+                    }
                 } catch(Exception e )  { }
             }
         }, 500);

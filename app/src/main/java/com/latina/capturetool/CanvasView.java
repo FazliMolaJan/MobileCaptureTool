@@ -895,6 +895,5 @@ public class CanvasView extends View {
      */
     public boolean isChanged() { return changed; }
 
-    public void clearChanged() { this.changed = false; }
-
+    public void setChanged(boolean changed) { this.changed = changed; }
 }

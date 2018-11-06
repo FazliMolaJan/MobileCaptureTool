@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 
@@ -99,15 +100,14 @@ public class AlwaysTopService extends Service {
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
                 switch(menuItem.getItemId()) {
-                    case R.id.menu_capture :
-                        fabSpeedDial.hide();
+                    case R.id.menu_capture : // 촬영 버튼
                         startActivity(new Intent(getApplicationContext(), ScreenShot.class));
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                fabSpeedDial.show();
-                            }
-                        }, 3500);
+                        Toast.makeText(AlwaysTopService.this, "촬영 완료", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.menu_capture_edit :
+                        Intent intent = new Intent(getApplicationContext(), ScreenShot.class);
+                        intent.putExtra("mode", true);
+                        startActivity(intent);
                         break;
                 }
                 return true;

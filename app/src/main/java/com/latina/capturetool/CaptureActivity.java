@@ -50,6 +50,8 @@ public class CaptureActivity extends AppCompatActivity {
     String filePath; // 이미지 파일 경로
     private String cachePath;
 
+    private boolean isCache = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +115,7 @@ public class CaptureActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
             cachePath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
             CropImage.activity(Uri.parse(cachePath)).start(this); // CropImage Start
+            isCache = true;
         } else if (v == btn_check) { // 확인 후 저장 버튼
             save();
         }
@@ -139,15 +142,22 @@ public class CaptureActivity extends AppCompatActivity {
         } else if (v == btn_undo) { // Undo 버튼
             canvas.undo();
             if(!canvas.undo())
-                canvas.clearChanged();
+                canvas.setChanged(false);
             else
                 canvas.redo();
         } else if (v == btn_redo) { // Redo 버튼
             canvas.redo();
         } else if (v == btn_clear) { // 그렸던 작업 초기화
             while (canvas.undo()) ;
-            canvas.clearChanged();
+            canvas.setChanged(false);
         }
+    }
+
+    @Override
+    protected void onDestroy() { // 비정상 종료시 캐시 파일 삭제
+        if(isCache)
+            deleteCacheFile();
+        super.onDestroy();
     }
 
     private void save() { // 이미지 저장(변경이 되었을 경우 동작)
@@ -191,21 +201,20 @@ public class CaptureActivity extends AppCompatActivity {
         builder.setNegativeButton("취소", null);
         builder.create().show();
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) { // Crop 결과 들어오면 실행
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            deleteCacheFile();
             if (resultCode == RESULT_OK && result != null) {
                 try {
-                    deleteCacheFile();
+                    canvas.setChanged(true); // 수정 상태로 변경
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result.getUri()); // Uri -> Bitmap
                     int canvasWidth = (bitmap.getWidth() > canvas.getWidth()) ? canvas.getWidth() : bitmap.getWidth();
                     int canvasHeight = (bitmap.getHeight() > canvas.getHeight()) ? canvas.getHeight() : bitmap.getHeight();
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(canvasWidth, canvasHeight);
                     params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                     canvas.setLayoutParams(params);
-                    Toast.makeText(this, "Width : " + canvas.getWidth() + " Height : " + canvas.getHeight(), Toast.LENGTH_SHORT).show();
                     canvas.drawBitmap(bitmap);
                 } catch(IOException e) {e.printStackTrace(); }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -288,16 +297,12 @@ public class CaptureActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     private void deleteCacheFile() { // Temp 이미지 삭제
         File file = new File(UriManager.getPath(this, Uri.parse(cachePath)));
         if (file.exists()) {
             file.delete();
             Toast.makeText(this, "삭제 완료", Toast.LENGTH_SHORT).show();
+            isCache = false;
         }
     }
 }
