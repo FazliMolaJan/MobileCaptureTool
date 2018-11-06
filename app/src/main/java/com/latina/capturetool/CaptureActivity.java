@@ -19,6 +19,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +51,6 @@ public class CaptureActivity extends AppCompatActivity {
 
     String filePath; // 이미지 파일 경로
     private String cachePath;
-
     private boolean isCache = false;
 
     @Override
@@ -81,7 +82,6 @@ public class CaptureActivity extends AppCompatActivity {
         btn_redo = findViewById(R.id.redoButton);
         btn_clear = findViewById(R.id.clearButton);
         btn_back = findViewById(R.id.backPress);
-
         strokeWidth.setOnSeekBarChangeListener(seekBarChangeListener);
 
         // 스크린샷된 이미지 경로로부터 가져오기
@@ -93,12 +93,26 @@ public class CaptureActivity extends AppCompatActivity {
         File file = new File(filePath);
         Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 
+        // Bitmap 초기 크기 비교
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+        width = width > myBitmap.getWidth() ? myBitmap.getWidth() : width;
+        height = height > myBitmap.getHeight() ? myBitmap.getHeight() : height;
+        Bitmap bitmap = Bitmap.createScaledBitmap(myBitmap, width, height, true);
+
         // Canvas View 세팅
         canvas = findViewById(R.id.canvas);
-        canvas.drawBitmap(myBitmap);
         canvas.setLineCap(Paint.Cap.ROUND);
         canvas.setPaintStrokeWidth(10F);
         canvas.setDrawable(false);
+        canvas.drawBitmap(bitmap);
+        canvas.setBaseColor(Color.BLACK);
+
+        // Canvas 크기 조정
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        canvas.setLayoutParams(params);
     }
 
     // 일반 모드 리스너
@@ -167,7 +181,7 @@ public class CaptureActivity extends AppCompatActivity {
             else {
                 FileOutputStream fos;
                 try {
-                    File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CaptureTool");
+                    File dir = new File(MainActivity.IMAGE_DIR);
                     if (!dir.exists())
                         dir.mkdir();
                     File file = new File(filePath);
@@ -201,6 +215,7 @@ public class CaptureActivity extends AppCompatActivity {
         builder.setNegativeButton("취소", null);
         builder.create().show();
     }
+    // 크롭 -> 돌아왔다가 다시 CaptureActivity로 돌아오니 캔버스 크기가 비정상
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) { // Crop 결과 들어오면 실행
@@ -244,7 +259,8 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_capture, menu);
+        menu.add(0, 0, 0, "정보");
+        menu.add(0, 1, 0, "공유");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return super.onCreateOptionsMenu(menu);
     }

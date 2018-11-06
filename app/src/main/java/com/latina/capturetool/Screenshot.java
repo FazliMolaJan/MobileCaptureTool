@@ -124,8 +124,8 @@ public class ScreenShot extends AppCompatActivity {
 
                 bitmap = Bitmap.createBitmap(deviceWidth+rowPadding/pixelStride, deviceHeight, Bitmap.Config.ARGB_8888);
                 bitmap.copyPixelsFromBuffer(buffer);
-                image.close();
 
+                image.close();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
@@ -133,7 +133,7 @@ public class ScreenShot extends AppCompatActivity {
                 // 파일 저장
                 FileOutputStream fos;
                 try {
-                    File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CaptureTool");
+                    File dir = new File(MainActivity.IMAGE_DIR);
                     if(!dir.exists())
                         dir.mkdir();
                     String current = format.format(new Date());
