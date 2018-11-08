@@ -36,3 +36,4 @@ Toy Project - Screenshot using Media projection
   * Floating Action Button Speed Dial : https://github.com/yavski/fab-speed-dial
   * Android Image Cropper : https://github.com/ArthurHub/Android-Image-Cropper
   * Canvas View : https://github.com/Korilakkuma/CanvasView
+  * Glide : https://github.com/bumptech/glide
